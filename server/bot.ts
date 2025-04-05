@@ -265,7 +265,8 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     if (!isWeekend()) {
       await ctx.reply(
         "⚠️ Withdrawals are only available on weekends (Saturday and Sunday).\n" +
-        "Please try again on the weekend."
+        "Please try again on the weekend.",
+        getMainMenuKeyboard()
       );
       return;
     }
@@ -277,7 +278,8 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
         `Your current balance: ${formatCurrency(user.balance || 0)}\n\n` +
         `Join Fairmoney on Telegram and make ₦20k - ₦50k daily with your phone, it's free to join\n\n` +
         `Withdrawal is every Saturday, click on the link now to join, thank me later\n` +
-        `https://t.me/${(await bot.telegram.getMe()).username}?start=ref_${telegramId}`
+        `https://t.me/${(await bot.telegram.getMe()).username}?start=ref_${telegramId}`,
+        getMainMenuKeyboard()
       );
       return;
     }
@@ -288,7 +290,8 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
       `Your current balance: ${formatCurrency(user.balance || 0)}\n\n` +
       `Minimum withdrawal: ${formatCurrency(MIN_WITHDRAWAL_AMOUNT)}\n` +
       `Maximum withdrawal: ${formatCurrency(MAX_WITHDRAWAL_AMOUNT)}\n\n` +
-      `Please enter the amount you want to withdraw (${CURRENCY}XXXX):`
+      `Please enter the amount you want to withdraw (${CURRENCY}XXXX):`,
+      Markup.removeKeyboard()
     );
     
     // Set context to wait for amount
@@ -384,11 +387,16 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
         // Reset session state
         ctx.session.waitingForBankDetails = false;
         
+        // Check if user has enough balance for withdrawal
+        const updatedUser = await storage.getTelegramUser(telegramId);
+        const canWithdraw = (updatedUser?.balance || 0) >= MIN_WITHDRAWAL_AMOUNT;
+        
         await ctx.reply(
           `📊 Your Set Bank Details Is: ${accountNumber.trim()}\n` +
           `${bankName.trim()}\n` +
           `${accountName.trim()}\n\n` +
-          `✅ It Will Be Used For All Future Withdrawals.`,
+          `✅ It Will Be Used For All Future Withdrawals.` +
+          (canWithdraw ? `\n\nYou have enough balance to withdraw. Click the "Withdraw" button to proceed.` : ''),
           getMainMenuKeyboard()
         );
         return;
@@ -406,11 +414,16 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
         // Reset session state
         ctx.session.waitingForBankDetails = false;
         
+        // Check if user has enough balance for withdrawal
+        const updatedUser = await storage.getTelegramUser(telegramId);
+        const canWithdraw = (updatedUser?.balance || 0) >= MIN_WITHDRAWAL_AMOUNT;
+        
         await ctx.reply(
           `📊 Your Set Bank Details Is: ${accountNumber}\n` +
           `${bankName}\n` +
           `${accountName}\n\n` +
-          `✅ It Will Be Used For All Future Withdrawals.`,
+          `✅ It Will Be Used For All Future Withdrawals.` +
+          (canWithdraw ? `\n\nYou have enough balance to withdraw. Click the "Withdraw" button to proceed.` : ''),
           getMainMenuKeyboard()
         );
         return;
@@ -421,8 +434,12 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
           "ACC NUMBER\n" +
           "BANK NAME\n" +
           "ACC NAME\n\n" +
-          "Or simply send: ACCOUNT_NUMBER BANK_NAME ACCOUNT_NAME"
+          "Or simply send: ACCOUNT_NUMBER BANK_NAME ACCOUNT_NAME",
+          Markup.removeKeyboard()
         );
+        
+        // Keep waiting for bank details
+        ctx.session.waitingForBankDetails = true;
         return;
       }
     } 
@@ -432,18 +449,27 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
       const amount = parseInt(amountText);
       
       if (isNaN(amount)) {
-        await ctx.reply("Please enter a valid amount (numbers only).");
+        await ctx.reply(
+          "Please enter a valid amount (numbers only).", 
+          getMainMenuKeyboard()
+        );
         return;
       }
       
       // Check if amount is within allowed range
       if (amount < MIN_WITHDRAWAL_AMOUNT) {
-        await ctx.reply(`Minimum withdrawal amount is ${formatCurrency(MIN_WITHDRAWAL_AMOUNT)}.`);
+        await ctx.reply(
+          `Minimum withdrawal amount is ${formatCurrency(MIN_WITHDRAWAL_AMOUNT)}.`,
+          getMainMenuKeyboard()
+        );
         return;
       }
       
       if (amount > MAX_WITHDRAWAL_AMOUNT) {
-        await ctx.reply(`Maximum withdrawal amount is ${formatCurrency(MAX_WITHDRAWAL_AMOUNT)}.`);
+        await ctx.reply(
+          `Maximum withdrawal amount is ${formatCurrency(MAX_WITHDRAWAL_AMOUNT)}.`,
+          getMainMenuKeyboard()
+        );
         return;
       }
       
@@ -451,7 +477,8 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
       if (amount > (user.balance || 0)) {
         await ctx.reply(
           `You don't have enough balance for this withdrawal.\n` +
-          `Your current balance: ${formatCurrency(user.balance || 0)}`
+          `Your current balance: ${formatCurrency(user.balance || 0)}`,
+          getMainMenuKeyboard()
         );
         return;
       }
