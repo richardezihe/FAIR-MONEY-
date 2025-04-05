@@ -184,33 +184,7 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     );
   });
   
-  // Account Details command
-  bot.hears(BOT_COMMANDS.ACCOUNT_DETAILS, async (ctx) => {
-    const telegramId = ctx.from.id.toString();
-    const user = await storage.getTelegramUser(telegramId);
-    
-    if (!user) {
-      await ctx.reply("Please start the bot with /start command first.");
-      return;
-    }
-    
-    if (!user.hasJoinedGroups) {
-      await promptToJoinGroups(ctx);
-      return;
-    }
-    
-    // Show current bank details if set, otherwise prompt to add them
-    if (user.bankAccountNumber && user.bankName && user.bankAccountName) {
-      await ctx.reply(
-        `📊 Your Set Bank Details Is: ${user.bankAccountNumber}\n` +
-        `${user.bankName}\n` +
-        `${user.bankAccountName}\n\n` +
-        `✅ It Will Be Used For All Future Withdrawals.`
-      );
-    } else {
-      await promptForBankDetails(ctx);
-    }
-  });
+  // Account Details command has been removed
   
   // Statistics command
   bot.hears(BOT_COMMANDS.STATISTICS, async (ctx) => {
@@ -247,17 +221,6 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     
     if (!user.hasJoinedGroups) {
       await promptToJoinGroups(ctx);
-      return;
-    }
-    
-    // Check if user has bank details
-    if (!user.bankAccountNumber || !user.bankName || !user.bankAccountName) {
-      await ctx.reply(
-        "You need to set your bank details first before making a withdrawal request.",
-        Markup.keyboard([[BOT_COMMANDS.ACCOUNT_DETAILS]])
-          .resize()
-          .oneTime()
-      );
       return;
     }
     
@@ -372,79 +335,55 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
       const singleLinePattern = /^\s*(\d+)\s+(.+)\s+(.+)\s*$/;
       const singleLineMatch = text.match(singleLinePattern);
       
+      // Default bank details if user doesn't provide them
+      let accountNumber, bankName, accountName;
+      
       // Process the bank details if we have a valid format
       if (textLines.length === 3) {
         // Multi-line format
-        const [accountNumber, bankName, accountName] = textLines;
-        
-        // Update user's bank details
-        await storage.updateTelegramUser(telegramId, {
-          bankAccountNumber: accountNumber.trim(),
-          bankName: bankName.trim(),
-          bankAccountName: accountName.trim()
-        });
-        
-        // Reset session state
-        ctx.session.waitingForBankDetails = false;
-        
-        // Check if user has enough balance for withdrawal
-        const updatedUser = await storage.getTelegramUser(telegramId);
-        const canWithdraw = (updatedUser?.balance || 0) >= MIN_WITHDRAWAL_AMOUNT;
-        
-        await ctx.reply(
-          `📊 Your Set Bank Details Is: ${accountNumber.trim()}\n` +
-          `${bankName.trim()}\n` +
-          `${accountName.trim()}\n\n` +
-          `✅ It Will Be Used For All Future Withdrawals.` +
-          (canWithdraw ? `\n\nYou have enough balance to withdraw. Click the "Withdraw" button to proceed.` : ''),
-          getMainMenuKeyboard()
-        );
-        return;
+        [accountNumber, bankName, accountName] = textLines;
       } else if (singleLineMatch) {
         // Single line format
-        const [_, accountNumber, bankName, accountName] = singleLineMatch;
-        
-        // Update user's bank details
-        await storage.updateTelegramUser(telegramId, {
-          bankAccountNumber: accountNumber,
-          bankName: bankName,
-          bankAccountName: accountName
-        });
-        
-        // Reset session state
-        ctx.session.waitingForBankDetails = false;
-        
-        // Check if user has enough balance for withdrawal
-        const updatedUser = await storage.getTelegramUser(telegramId);
-        const canWithdraw = (updatedUser?.balance || 0) >= MIN_WITHDRAWAL_AMOUNT;
-        
-        await ctx.reply(
-          `📊 Your Set Bank Details Is: ${accountNumber}\n` +
-          `${bankName}\n` +
-          `${accountName}\n\n` +
-          `✅ It Will Be Used For All Future Withdrawals.` +
-          (canWithdraw ? `\n\nYou have enough balance to withdraw. Click the "Withdraw" button to proceed.` : ''),
-          getMainMenuKeyboard()
-        );
-        return;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [unused, accNum, bnkName, accName] = singleLineMatch;
+        accountNumber = accNum;
+        bankName = bnkName;
+        accountName = accName;
       } else {
-        // Invalid format, prompt the user with the correct format
-        await ctx.reply(
-          "Invalid format. Please provide your bank details in the format:\n" +
-          "ACC NUMBER\n" +
-          "BANK NAME\n" +
-          "ACC NAME\n\n" +
-          "Or simply send: ACCOUNT_NUMBER BANK_NAME ACCOUNT_NAME",
-          Markup.removeKeyboard()
-        );
-        
-        // Keep waiting for bank details
-        ctx.session.waitingForBankDetails = true;
-        return;
+        // If format is invalid, use default values
+        accountNumber = "123456789";
+        bankName = "Sample Bank";
+        accountName = user.firstName + " " + (user.lastName || "");
       }
+      
+      // Update user's bank details
+      await storage.updateTelegramUser(telegramId, {
+        bankAccountNumber: accountNumber.trim(),
+        bankName: bankName.trim(),
+        bankAccountName: accountName.trim()
+      });
+      
+      // Reset session state
+      ctx.session.waitingForBankDetails = false;
+      
+      // Check if user has enough balance for withdrawal
+      const updatedUser = await storage.getTelegramUser(telegramId);
+      const canWithdraw = (updatedUser?.balance || 0) >= MIN_WITHDRAWAL_AMOUNT;
+      
+      // Show confirmation
+      await ctx.reply(
+        `📊 Your Bank Details:\n` +
+        `Account Number: ${accountNumber.trim()}\n` +
+        `Bank Name: ${bankName.trim()}\n` +
+        `Account Name: ${accountName.trim()}\n\n` +
+        `✅ These details will be used for withdrawals.` +
+        (canWithdraw ? `\n\nYou have enough balance to withdraw. Click the "Withdraw" button to proceed.` : ''),
+        getMainMenuKeyboard()
+      );
+      return;
     } 
     // Handle withdrawal amount
-    else if (user.hasJoinedGroups && user.bankAccountNumber) {
+    else if (user.hasJoinedGroups) {
       const amountText = ctx.message.text.trim().replace(/[^0-9]/g, '');
       const amount = parseInt(amountText);
       
@@ -536,15 +475,9 @@ async function promptToJoinGroups(ctx: BotContext) {
 
 async function promptForBankDetails(ctx: BotContext) {
   await ctx.reply(
-    `💎 Add Bank Details 💎\n\n` +
-    `Now Send Your Correct Bank Details\n` +
-    `Format Option 1:\n` +
-    `ACCOUNT_NUMBER BANK_NAME ACCOUNT_NAME\n\n` +
-    `Format Option 2:\n` +
-    `ACC NUMBER\n` +
-    `BANK NAME\n` +
-    `ACC NAME\n\n` +
-    `⚠️ This Wallet Will Be Used For Future Withdrawals !!`
+    `💎 Enter Bank Details 💎\n\n` +
+    `Simply type a number for your account or you can press any key to continue with default bank details.\n\n` +
+    `Your details will be used for processing withdrawals.`
   );
   
   // Set context to wait for bank details
@@ -557,7 +490,7 @@ async function promptForBankDetails(ctx: BotContext) {
 function getMainMenuKeyboard() {
   return Markup.keyboard([
     [BOT_COMMANDS.BALANCE, BOT_COMMANDS.INVITE],
-    [BOT_COMMANDS.ACCOUNT_DETAILS, BOT_COMMANDS.STATISTICS, BOT_COMMANDS.WITHDRAW],
+    [BOT_COMMANDS.STATISTICS, BOT_COMMANDS.WITHDRAW],
     [BOT_COMMANDS.CLAIM]
   ])
     .resize();

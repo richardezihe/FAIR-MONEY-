@@ -3,7 +3,6 @@ export const BOT_COMMANDS = {
   START: '/start',
   BALANCE: '💰 Balance',
   INVITE: '👥 Invite',
-  ACCOUNT_DETAILS: '📝 Account Details',
   STATISTICS: '📊 Statistics',
   WITHDRAW: '💸 Withdraw',
   CLAIM: '🎁 Claim ₦1000 now',
