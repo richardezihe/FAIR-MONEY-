@@ -89,5 +89,12 @@
     "createdAt": "2025-04-05T17:37:21.247Z",
     "expiresAt": "2025-04-06T17:37:21.247Z",
     "id": 13
+  },
+  {
+    "userId": 1,
+    "token": "f2a0e1aeef1dc8429c7b83680c54ddda41cfde613cb1decf18df7438807a0f865eb092fa25a9782767a7757a368e9d8c8cd7c6a9d3aba15cc44df719368fadae",
+    "createdAt": "2025-04-05T17:53:22.237Z",
+    "expiresAt": "2025-04-06T17:53:22.237Z",
+    "id": 14
   }
 ]
