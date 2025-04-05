@@ -360,13 +360,41 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     if (ctx.session?.waitingForBankDetails) {
       const text = ctx.message.text.trim();
       
-      // Handle single line input format (user just types the details as a single message)
-      // This handles the case shown in the screenshot
-      const singleLinePattern = /^\s*(\d+)\s+(.+)\s+(.+)\s*$/;
-      const match = text.match(singleLinePattern);
+      // Parse the input - try different formats
       
-      if (match) {
-        const [_, accountNumber, bankName, accountName] = match;
+      // 1. Try the format from screenshots (3 lines/values)
+      const textLines = text.split('\n').filter(line => line.trim().length > 0);
+      
+      // 2. Try the space-separated format as a fallback
+      const singleLinePattern = /^\s*(\d+)\s+(.+)\s+(.+)\s*$/;
+      const singleLineMatch = text.match(singleLinePattern);
+      
+      // Process the bank details if we have a valid format
+      if (textLines.length === 3) {
+        // Multi-line format
+        const [accountNumber, bankName, accountName] = textLines;
+        
+        // Update user's bank details
+        await storage.updateTelegramUser(telegramId, {
+          bankAccountNumber: accountNumber.trim(),
+          bankName: bankName.trim(),
+          bankAccountName: accountName.trim()
+        });
+        
+        // Reset session state
+        ctx.session.waitingForBankDetails = false;
+        
+        await ctx.reply(
+          `📊 Your Set Bank Details Is: ${accountNumber.trim()}\n` +
+          `${bankName.trim()}\n` +
+          `${accountName.trim()}\n\n` +
+          `✅ It Will Be Used For All Future Withdrawals.`,
+          getMainMenuKeyboard()
+        );
+        return;
+      } else if (singleLineMatch) {
+        // Single line format
+        const [_, accountNumber, bankName, accountName] = singleLineMatch;
         
         // Update user's bank details
         await storage.updateTelegramUser(telegramId, {
@@ -386,12 +414,8 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
           getMainMenuKeyboard()
         );
         return;
-      }
-      
-      // Try the multiline format as a fallback
-      const lines = text.split('\n');
-      
-      if (lines.length < 3) {
+      } else {
+        // Invalid format, prompt the user with the correct format
         await ctx.reply(
           "Invalid format. Please provide your bank details in the format:\n" +
           "ACC NUMBER\n" +
@@ -401,26 +425,6 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
         );
         return;
       }
-      
-      const [accountNumber, bankName, accountName] = lines;
-      
-      // Update user's bank details
-      await storage.updateTelegramUser(telegramId, {
-        bankAccountNumber: accountNumber,
-        bankName: bankName,
-        bankAccountName: accountName
-      });
-      
-      // Reset session state
-      ctx.session.waitingForBankDetails = false;
-      
-      await ctx.reply(
-        `📊 Your Set Bank Details Is: ${accountNumber}\n` +
-        `${bankName}\n` +
-        `${accountName}\n\n` +
-        `✅ It Will Be Used For All Future Withdrawals.`,
-        getMainMenuKeyboard()
-      );
     } 
     // Handle withdrawal amount
     else if (user.hasJoinedGroups && user.bankAccountNumber) {
