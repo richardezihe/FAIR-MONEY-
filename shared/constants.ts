@@ -5,6 +5,7 @@ export const BOT_COMMANDS = {
   INVITE: '👥 Invite',
   STATISTICS: '📊 Statistics',
   WITHDRAW: '💸 Withdraw',
+  ACCOUNT_DETAILS: '📝 Account Details',
   CLAIM: '🎁 Claim ₦1000 now',
   JOINED: 'Joined'
 };

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { storage } from '../storage';
 import { DEFAULT_STATS } from '@shared/constants';
+import { formatCurrency } from '../utils';
+import { initBot } from '../bot';
 
 export async function getDashboardStats(req: Request, res: Response) {
   try {
@@ -71,14 +73,50 @@ export async function updateWithdrawalStatus(req: Request, res: Response) {
       return res.status(404).json({ message: 'Withdrawal request not found' });
     }
     
-    // If approved, update user balance
-    if (status === 'approved') {
-      const user = await storage.getTelegramUser(updatedRequest.telegramUserId);
-      if (user) {
-        await storage.updateTelegramUser(user.telegramId, {
-          balance: Math.max(0, user.balance - updatedRequest.amount)
-        });
+    // Get user data
+    const user = await storage.getTelegramUser(updatedRequest.telegramUserId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    try {
+      // Get bot token from env variables
+      const token = process.env.TELEGRAM_BOT_TOKEN;
+      if (!token) {
+        console.error("Missing TELEGRAM_BOT_TOKEN environment variable");
+      } else {
+        // Initialize the bot
+        const bot = initBot(token);
+        
+        // Send notification based on status
+        if (status === 'approved') {
+          // Send approval notification
+          await bot.telegram.sendMessage(
+            user.telegramId,
+            `🎉 Congratulations! Your withdrawal request has been APPROVED!\n\n` +
+            `Amount: ${formatCurrency(updatedRequest.amount)}\n` +
+            `Bank: ${updatedRequest.bankName}\n` +
+            `Account: ${updatedRequest.bankAccountNumber}\n\n` +
+            `Your money has been sent to your account. Thank you for using Fairmoney!`
+          );
+        } else if (status === 'rejected') {
+          // Send rejection notification
+          await bot.telegram.sendMessage(
+            user.telegramId,
+            `❌ Your withdrawal request has been REJECTED.\n\n` +
+            `Amount: ${formatCurrency(updatedRequest.amount)}\n\n` +
+            `The amount has been returned to your balance. Please contact support if you have any questions.`
+          );
+          
+          // Return the amount to the user's balance if rejected
+          await storage.updateTelegramUser(user.telegramId, {
+            balance: (user.balance ?? 0) + updatedRequest.amount
+          });
+        }
       }
+    } catch (botError) {
+      console.error('Error sending notification:', botError);
+      // Continue with the response even if notification fails
     }
     
     res.status(200).json(updatedRequest);

@@ -67,13 +67,28 @@ export function getElapsedTimeString(date: Date): string {
 
 // Generate a unique referral link
 export function generateReferralLink(telegramId: string, botUsername: string): string {
+  // The correct format that Telegram expects for deep linking is ?start=parameter
   return `https://t.me/${botUsername}?start=ref_${telegramId}`;
 }
 
 // Extract referrer ID from start command
 export function extractReferrerId(startCommand: string): string | null {
-  const match = startCommand.match(/^\/start ref_(.+)$/);
-  return match ? match[1] : null;
+  console.log("Extracting referrer ID from:", startCommand);
+  
+  // When a user clicks on a deep link, Telegram formats it like "/start ref_123456789"
+  // or sometimes just "/start ref_123456789"
+  const spaceMatch = startCommand.match(/^\/start\s+ref_(\d+).*$/);
+  if (spaceMatch) {
+    return spaceMatch[1];
+  }
+  
+  // For deep links, Telegram might also send it as "/start ref_123456789"
+  const noSpaceMatch = startCommand.match(/^\/start ref_(\d+).*$/);
+  if (noSpaceMatch) {
+    return noSpaceMatch[1];
+  }
+  
+  return null;
 }
 
 // Format time in 12-hour format with AM/PM

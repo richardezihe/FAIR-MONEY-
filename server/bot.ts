@@ -48,10 +48,15 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
   bot.command('start', async (ctx) => {
     const startPayload = ctx.message.text.trim();
     const telegramId = ctx.from.id.toString();
+    
+    // Debug logging
+    console.log("Received start command with payload:", startPayload);
+    
     let user = await storage.getTelegramUser(telegramId);
     
     // Check if this is a referral
     const referrerId = extractReferrerId(startPayload);
+    console.log("Extracted referrer ID:", referrerId);
     
     // Create user if they don't exist
     if (!user) {
@@ -184,7 +189,42 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     );
   });
   
-  // Account Details command has been removed
+  // Account Details command
+  bot.hears(BOT_COMMANDS.ACCOUNT_DETAILS, async (ctx) => {
+    const telegramId = ctx.from.id.toString();
+    const user = await storage.getTelegramUser(telegramId);
+    
+    if (!user) {
+      await ctx.reply("Please start the bot with /start command first.");
+      return;
+    }
+    
+    if (!user.hasJoinedGroups) {
+      await promptToJoinGroups(ctx);
+      return;
+    }
+    
+    // Show current bank details if set, otherwise prompt to add them
+    if (user.bankAccountNumber && user.bankName && user.bankAccountName) {
+      await ctx.reply(
+        `📊 Your Bank Details:\n\n` +
+        `Account Number: ${user.bankAccountNumber}\n` +
+        `Bank Name: ${user.bankName}\n` +
+        `Account Name: ${user.bankAccountName}\n\n` +
+        `✅ These details will be used for all withdrawals.\n\n` +
+        `To update your details, just type them below in any format.`,
+        Markup.removeKeyboard()
+      );
+      
+      // Set context to wait for new bank details
+      ctx.session = {
+        ...ctx.session,
+        waitingForBankDetails: true
+      };
+    } else {
+      await promptForBankDetails(ctx);
+    }
+  });
   
   // Statistics command
   bot.hears(BOT_COMMANDS.STATISTICS, async (ctx) => {
@@ -490,7 +530,7 @@ async function promptForBankDetails(ctx: BotContext) {
 function getMainMenuKeyboard() {
   return Markup.keyboard([
     [BOT_COMMANDS.BALANCE, BOT_COMMANDS.INVITE],
-    [BOT_COMMANDS.STATISTICS, BOT_COMMANDS.WITHDRAW],
+    [BOT_COMMANDS.STATISTICS, BOT_COMMANDS.ACCOUNT_DETAILS, BOT_COMMANDS.WITHDRAW],
     [BOT_COMMANDS.CLAIM]
   ])
     .resize();
