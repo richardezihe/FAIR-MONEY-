@@ -359,6 +359,36 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     // If waiting for bank details
     if (ctx.session?.waitingForBankDetails) {
       const text = ctx.message.text.trim();
+      
+      // Handle single line input format (user just types the details as a single message)
+      // This handles the case shown in the screenshot
+      const singleLinePattern = /^\s*(\d+)\s+(.+)\s+(.+)\s*$/;
+      const match = text.match(singleLinePattern);
+      
+      if (match) {
+        const [_, accountNumber, bankName, accountName] = match;
+        
+        // Update user's bank details
+        await storage.updateTelegramUser(telegramId, {
+          bankAccountNumber: accountNumber,
+          bankName: bankName,
+          bankAccountName: accountName
+        });
+        
+        // Reset session state
+        ctx.session.waitingForBankDetails = false;
+        
+        await ctx.reply(
+          `📊 Your Set Bank Details Is: ${accountNumber}\n` +
+          `${bankName}\n` +
+          `${accountName}\n\n` +
+          `✅ It Will Be Used For All Future Withdrawals.`,
+          getMainMenuKeyboard()
+        );
+        return;
+      }
+      
+      // Try the multiline format as a fallback
       const lines = text.split('\n');
       
       if (lines.length < 3) {
@@ -366,7 +396,8 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
           "Invalid format. Please provide your bank details in the format:\n" +
           "ACC NUMBER\n" +
           "BANK NAME\n" +
-          "ACC NAME"
+          "ACC NAME\n\n" +
+          "Or simply send: ACCOUNT_NUMBER BANK_NAME ACCOUNT_NAME"
         );
         return;
       }
@@ -476,7 +507,10 @@ async function promptForBankDetails(ctx: BotContext) {
   await ctx.reply(
     `💎 Add Bank Details 💎\n\n` +
     `Now Send Your Correct Bank Details\n` +
-    `Format: ACC NUMBER\n` +
+    `Format Option 1:\n` +
+    `ACCOUNT_NUMBER BANK_NAME ACCOUNT_NAME\n\n` +
+    `Format Option 2:\n` +
+    `ACC NUMBER\n` +
     `BANK NAME\n` +
     `ACC NAME\n\n` +
     `⚠️ This Wallet Will Be Used For Future Withdrawals !!`

@@ -44,18 +44,26 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 }
 
 function Router() {
+  const { isLoading } = useAuth();
+  
+  // Show loading indicator while auto-authentication is happening
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <div className="w-full max-w-md space-y-4 p-4">
+          <Skeleton className="h-8 w-3/4 mx-auto" />
+          <Skeleton className="h-64 w-full rounded-lg" />
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <Switch>
-      <Route path={ROUTES.LOGIN} component={Login} />
-      <Route path={ROUTES.DASHBOARD}>
-        <ProtectedRoute component={Dashboard} />
-      </Route>
-      <Route path={ROUTES.WITHDRAWAL_REQUESTS}>
-        <ProtectedRoute component={WithdrawalRequests} />
-      </Route>
-      <Route path={ROUTES.ALL_USERS}>
-        <ProtectedRoute component={AllUsers} />
-      </Route>
+      {/* Direct dashboard access - login page no longer needed */}
+      <Route path={ROUTES.DASHBOARD} component={Dashboard} />
+      <Route path={ROUTES.WITHDRAWAL_REQUESTS} component={WithdrawalRequests} />
+      <Route path={ROUTES.ALL_USERS} component={AllUsers} />
       <Route path="/">
         <Redirect to={ROUTES.DASHBOARD} />
       </Route>

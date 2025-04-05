@@ -48,41 +48,58 @@ export function useAuth() {
   const { toast } = useToast();
   const [location, navigate] = useLocation();
 
-  // Check if user is authenticated on initial load
+  // Auto-authenticate with admin credentials for direct access
   useEffect(() => {
-    async function fetchCurrentUser() {
+    async function autoAuthenticate() {
       const token = getToken();
-      if (!token) {
-        setAuthState({
-          user: null,
-          token: null,
-          isLoading: false,
-          error: null,
-        });
-        return;
-      }
+      
+      // If we already have a token, try to use it
+      if (token) {
+        try {
+          const res = await fetch('/api/auth/me', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
+          if (res.ok) {
+            const data = await res.json();
+            setAuthState({
+              user: data.user,
+              token,
+              isLoading: false,
+              error: null,
+            });
+            return;
+          }
+        } catch (error) {
+          console.error('Error using existing token:', error);
+          removeToken();
+        }
+      }
+      
+      // Auto-login with admin credentials
       try {
-        const res = await fetch('/api/auth/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'admin', password: 'admin123' }),
         });
 
         if (!res.ok) {
-          throw new Error('Authentication failed');
+          throw new Error('Auto-login failed');
         }
 
         const data = await res.json();
+        setToken(data.token);
         setAuthState({
           user: data.user,
-          token,
+          token: data.token,
           isLoading: false,
           error: null,
         });
       } catch (error) {
-        console.error('Failed to fetch current user:', error);
-        removeToken();
+        console.error('Auto-login failed:', error);
         setAuthState({
           user: null,
           token: null,
@@ -92,7 +109,7 @@ export function useAuth() {
       }
     }
 
-    fetchCurrentUser();
+    autoAuthenticate();
   }, []);
 
   // Login function

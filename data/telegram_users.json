@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "telegramId": "8045084951",
+    "firstName": "Ezihe",
+    "lastName": "",
+    "username": "Ezihe001",
+    "joinedAt": "2025-04-05T16:53:15.683Z",
+    "balance": 1000,
+    "referralCount": 0,
+    "hasJoinedGroups": true,
+    "lastBonusClaim": "2025-04-05T16:54:17.648Z",
+    "id": 1
+  }
+]
