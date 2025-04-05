@@ -49,8 +49,8 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
           <nav className="space-y-1">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
-                <a
-                  className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                <button
+                  className={`flex items-center px-4 py-2 text-sm font-medium rounded-md w-full text-left ${
                     currentLocation === item.href
                       ? 'bg-primary-50 text-primary dark:bg-primary-900 dark:text-primary-300'
                       : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
@@ -58,7 +58,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                 >
                   {item.icon}
                   {item.label}
-                </a>
+                </button>
               </Link>
             ))}
           </nav>
@@ -113,8 +113,8 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
           <div className="flex justify-around py-2">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
-                <a
-                  className={`flex flex-col items-center p-2 ${
+                <button
+                  className={`flex flex-col items-center p-2 bg-transparent border-0 ${
                     currentLocation === item.href
                       ? 'text-primary'
                       : 'text-gray-600 dark:text-gray-400'
@@ -122,7 +122,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
                 >
                   {React.cloneElement(item.icon as React.ReactElement, { className: 'h-5 w-5 mb-1' })}
                   <span className="text-xs">{item.label}</span>
-                </a>
+                </button>
               </Link>
             ))}
           </div>

@@ -44,13 +44,13 @@ export default function Dashboard() {
             ) : (
               <div className="text-2xl font-bold">{data?.totalUsers.toLocaleString()}</div>
             )}
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {isLoading ? (
                 <Skeleton className="h-4 w-24" />
               ) : (
                 `Active users: ${data?.actualUsers.toLocaleString()}`
               )}
-            </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -68,13 +68,13 @@ export default function Dashboard() {
                 {formatCurrency(data?.totalPayouts || 0)}
               </div>
             )}
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {isLoading ? (
                 <Skeleton className="h-4 w-32" />
               ) : (
                 `Actual payouts: ${formatCurrency(data?.actualPayouts || 0)}`
               )}
-            </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -92,9 +92,9 @@ export default function Dashboard() {
                 {data?.pendingWithdrawals || 0}
               </div>
             )}
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Waiting for approval
-            </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -110,9 +110,9 @@ export default function Dashboard() {
             ) : (
               <div className="text-2xl font-bold">{data?.recentUsers || 0}</div>
             )}
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               New users in last 30 days
-            </p>
+            </div>
           </CardContent>
         </Card>
       </div>
