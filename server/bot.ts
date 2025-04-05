@@ -77,8 +77,8 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
         if (referrer) {
           // Add referral bonus to the referrer
           await storage.updateTelegramUser(referrerId, {
-            balance: referrer.balance + REFERRAL_BONUS_AMOUNT,
-            referralCount: referrer.referralCount + 1
+            balance: (referrer.balance || 0) + REFERRAL_BONUS_AMOUNT,
+            referralCount: (referrer.referralCount || 0) + 1
           });
           
           // Send notification to the referrer
@@ -147,13 +147,13 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     }
     
     await ctx.reply(
-      `💰 Your Current Balance: ${formatCurrency(user.balance)}\n\n` +
-      `👥 Total Referrals: ${user.referralCount} User(s)\n\n` +
+      `💰 Your Current Balance: ${formatCurrency(user.balance || 0)}\n\n` +
+      `👥 Total Referrals: ${user.referralCount || 0} User(s)\n\n` +
       `🏦 Your Bank Details:\n` +
       (user.bankAccountNumber ? 
         `Account Number: ${user.bankAccountNumber}\n` +
-        `Bank Name: ${user.bankName}\n` +
-        `Account Name: ${user.bankAccountName}` : 
+        `Bank Name: ${user.bankName || ''}\n` +
+        `Account Name: ${user.bankAccountName || ''}` : 
         "Not set yet. Please update your account details.")
     );
   });
@@ -271,10 +271,10 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     }
     
     // Check if user has enough balance
-    if (user.balance < MIN_WITHDRAWAL_AMOUNT) {
+    if ((user.balance || 0) < MIN_WITHDRAWAL_AMOUNT) {
       await ctx.reply(
         `⚠️ Must Own Atleast ${formatCurrency(MIN_WITHDRAWAL_AMOUNT)} To Make Withdrawal\n\n` +
-        `Your current balance: ${formatCurrency(user.balance)}\n\n` +
+        `Your current balance: ${formatCurrency(user.balance || 0)}\n\n` +
         `Join Fairmoney on Telegram and make ₦20k - ₦50k daily with your phone, it's free to join\n\n` +
         `Withdrawal is every Saturday, click on the link now to join, thank me later\n` +
         `https://t.me/${(await bot.telegram.getMe()).username}?start=ref_${telegramId}`
@@ -285,7 +285,7 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     // Prompt for withdrawal amount
     await ctx.reply(
       `💸 Withdrawal Request\n\n` +
-      `Your current balance: ${formatCurrency(user.balance)}\n\n` +
+      `Your current balance: ${formatCurrency(user.balance || 0)}\n\n` +
       `Minimum withdrawal: ${formatCurrency(MIN_WITHDRAWAL_AMOUNT)}\n` +
       `Maximum withdrawal: ${formatCurrency(MAX_WITHDRAWAL_AMOUNT)}\n\n` +
       `Please enter the amount you want to withdraw (${CURRENCY}XXXX):`
@@ -331,7 +331,7 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
     
     // Award bonus
     const updatedUser = await storage.updateTelegramUser(telegramId, {
-      balance: user.balance + CLAIM_BONUS_AMOUNT,
+      balance: (user.balance || 0) + CLAIM_BONUS_AMOUNT,
       lastBonusClaim: now
     });
     
@@ -448,10 +448,10 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
       }
       
       // Check if user has enough balance
-      if (amount > user.balance) {
+      if (amount > (user.balance || 0)) {
         await ctx.reply(
           `You don't have enough balance for this withdrawal.\n` +
-          `Your current balance: ${formatCurrency(user.balance)}`
+          `Your current balance: ${formatCurrency(user.balance || 0)}`
         );
         return;
       }
@@ -462,14 +462,14 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
         amount: amount,
         createdAt: new Date(),
         status: 'pending',
-        bankAccountNumber: user.bankAccountNumber,
-        bankName: user.bankName,
-        bankAccountName: user.bankAccountName
+        bankAccountNumber: user.bankAccountNumber || '',
+        bankName: user.bankName || '',
+        bankAccountName: user.bankAccountName || ''
       });
       
       // Deduct amount from user's balance
       await storage.updateTelegramUser(telegramId, {
-        balance: user.balance - amount
+        balance: (user.balance || 0) - amount
       });
       
       await ctx.reply(

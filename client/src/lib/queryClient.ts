@@ -13,7 +13,7 @@ export async function apiRequest(
   data?: unknown | undefined,
 ): Promise<Response> {
   // Add the auth token from localStorage to all API requests
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('fairmoneyapp_token');
   const headers: HeadersInit = {
     ...(data ? { "Content-Type": "application/json" } : {}),
     ...(token ? { "Authorization": `Bearer ${token}` } : {})
@@ -37,7 +37,7 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     // Add the auth token to queries as well
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('fairmoneyapp_token');
     const headers: HeadersInit = token ? { "Authorization": `Bearer ${token}` } : {};
     
     const res = await fetch(queryKey[0] as string, {
