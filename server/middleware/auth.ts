@@ -26,7 +26,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
 
     // Attach user to request for use in route handlers
-    req.body.user = user;
+    (req as any).user = user;
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
@@ -36,7 +36,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
 // Middleware to check if user is an admin
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  const user = req.body.user;
+  const user = (req as any).user;
   
   if (!user || !user.isAdmin) {
     return res.status(403).json({ message: 'Admin access required' });

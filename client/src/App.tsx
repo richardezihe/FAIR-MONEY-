@@ -1,4 +1,5 @@
 import { Switch, Route, useLocation, Redirect } from "wouter";
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
@@ -9,12 +10,19 @@ import { useAuth } from "@/lib/auth";
 import { ROUTES } from "@shared/constants";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Protected route component
-const ProtectedRoute = ({ component: Component, ...rest }: any) => {
+// Protected route component to handle authentication
+function ProtectedRoute({ component: Component }: { component: React.ComponentType<any> }) {
   const { isAuthenticated, isLoading } = useAuth();
-  const [location, setLocation] = useLocation();
-
-  // Show loading state while checking authentication
+  const [, navigate] = useLocation();
+  
+  // Handle redirection when auth state changes
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+    }
+  }, [isLoading, isAuthenticated, navigate]);
+  
+  // Show loading indicator while checking auth
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
@@ -25,16 +33,15 @@ const ProtectedRoute = ({ component: Component, ...rest }: any) => {
       </div>
     );
   }
-
-  // Redirect to login if not authenticated
+  
+  // Don't render anything while redirecting
   if (!isAuthenticated) {
-    setLocation(ROUTES.LOGIN);
     return null;
   }
-
-  // Render the component if authenticated
-  return <Component {...rest} />;
-};
+  
+  // Render the component when authenticated
+  return <Component />;
+}
 
 function Router() {
   return (

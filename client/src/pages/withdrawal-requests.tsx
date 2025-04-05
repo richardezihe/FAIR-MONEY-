@@ -94,7 +94,7 @@ export default function WithdrawalRequests() {
     },
     {
       key: 'bankDetails',
-      header: 'Banknote Details',
+      header: 'Bank Details',
       cell: (row: WithdrawalRequest) => (
         <div>
           <div className="font-medium">{row.bankName}</div>
@@ -251,7 +251,7 @@ export default function WithdrawalRequests() {
 
               <div className="flex items-center justify-between">
                 <div className="text-sm font-medium flex items-center">
-                  <Banknote className="w-4 h-4 mr-1" /> Banknote
+                  <Banknote className="w-4 h-4 mr-1" /> Bank
                 </div>
                 <div>
                   {selectedRequest.bankName}

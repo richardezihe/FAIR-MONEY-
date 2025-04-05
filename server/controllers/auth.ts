@@ -67,7 +67,11 @@ export async function logout(req: Request, res: Response) {
 
 export async function me(req: Request, res: Response) {
   try {
-    const user = req.body.user;
+    const user = (req as any).user;
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
     
     res.status(200).json({
       user: {

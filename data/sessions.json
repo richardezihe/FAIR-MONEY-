@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "userId": 1,
+    "token": "6b9cd76e464f9da11e213364391e814cc800f155592fe8275865bd6be13eca3b86c6bf43de833d940ed05b4cf0b46ee73b64d3e6b899c69263d038b7574da38a",
+    "createdAt": "2025-04-05T16:51:03.419Z",
+    "expiresAt": "2025-04-06T16:51:03.419Z",
+    "id": 1
+  }
+]

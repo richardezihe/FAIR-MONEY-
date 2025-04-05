@@ -100,7 +100,19 @@ export function useAuth() {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const res = await apiRequest('POST', '/api/auth/login', { username, password });
+      // Use direct fetch for more control over the response
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        // If login failed, throw an error
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Invalid credentials');
+      }
+
       const data = await res.json();
 
       setToken(data.token);
