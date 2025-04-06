@@ -1,4 +1,5 @@
 # FAIR MONEY Telegram Bot
+# BOT MADE BY EZIHE, EVILSPIRITE 
 
 A Telegram bot that gamifies user referrals, enabling users to earn and withdraw money through an interactive invitation system with real-time tracking and financial rewards.
 
