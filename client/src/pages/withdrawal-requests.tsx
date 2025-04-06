@@ -100,25 +100,14 @@ export default function WithdrawalRequests() {
       header: 'Bank Details',
       cell: (row: WithdrawalRequest) => (
         <div className="space-y-1 py-1">
-          <div className="text-sm">
-            Account Name:
+          <div className="text-sm font-medium">
+            Name: {row.bankAccountName}
           </div>
           <div className="text-sm font-medium">
-            {row.bankAccountName}
-          </div>
-
-          <div className="text-sm mt-2">
-            Bank:
+            Bank: {row.bankName}
           </div>
           <div className="text-sm font-medium">
-            {row.bankName}
-          </div>
-
-          <div className="text-sm mt-2">
-            Account #:
-          </div>
-          <div className="text-sm font-medium">
-            {row.bankAccountNumber}
+            Account: {row.bankAccountNumber}
           </div>
         </div>
       ),
@@ -289,21 +278,15 @@ export default function WithdrawalRequests() {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-sm text-gray-500">Account Name:</div>
+                    <div className="text-sm text-gray-500">Account Details:</div>
                     <div className="font-medium">
-                      {selectedRequest.bankAccountName}
+                      Name: {selectedRequest.bankAccountName}
                     </div>
-                  </div>
-                  <div className="space-y-1 mt-2">
-                    <div className="text-sm text-gray-500">Bank:</div>
                     <div className="font-medium">
-                      {selectedRequest.bankName}
+                      Bank: {selectedRequest.bankName}
                     </div>
-                  </div>
-                  <div className="space-y-1 mt-2">
-                    <div className="text-sm text-gray-500">Account #:</div>
                     <div className="font-medium">
-                      {selectedRequest.bankAccountNumber}
+                      Account: {selectedRequest.bankAccountNumber}
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
