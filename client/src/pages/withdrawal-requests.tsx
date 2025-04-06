@@ -100,9 +100,9 @@ export default function WithdrawalRequests() {
       header: 'Bank Details',
       cell: (row: WithdrawalRequest) => (
         <div>
-          <div className="font-medium">{row.bankName || row.user?.bankName || "N/A"}</div>
-          <div className="text-xs text-gray-500">{row.bankAccountNumber || row.user?.bankAccountNumber || "N/A"}</div>
-          <div className="text-xs text-gray-500">{row.bankAccountName || row.user?.bankAccountName || "N/A"}</div>
+          <div className="font-medium">{row.bankName}</div>
+          <div className="text-xs text-gray-500">{row.bankAccountNumber}</div>
+          <div className="text-xs text-gray-500">{row.bankAccountName}</div>
         </div>
       ),
     },
@@ -241,7 +241,7 @@ export default function WithdrawalRequests() {
               <div className="flex items-center justify-between">
                 <div className="text-sm font-medium">User</div>
                 <div>
-                  {selectedRequest.user?.firstName} {selectedRequest.user?.lastName || ''}
+                  {selectedRequest.user?.firstName || ''} {selectedRequest.user?.lastName || ''}
                 </div>
               </div>
               

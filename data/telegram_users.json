@@ -4,23 +4,11 @@
     "firstName": "Ezihe",
     "lastName": "",
     "username": "Ezihe001",
-    "joinedAt": "2025-04-05T16:53:15.683Z",
-    "balance": 10000,
+    "joinedAt": "2025-04-06T06:50:28.355Z",
+    "balance": 1000,
     "referralCount": 0,
     "hasJoinedGroups": true,
-    "lastBonusClaim": "2025-04-06T06:38:49.110Z",
+    "lastBonusClaim": "2025-04-06T06:50:49.809Z",
     "id": 1
-  },
-  {
-    "telegramId": "5922141261",
-    "firstName": "Ezihe",
-    "lastName": "Juliet",
-    "username": "",
-    "joinedAt": "2025-04-05T17:48:03.015Z",
-    "balance": 5000,
-    "referralCount": 0,
-    "hasJoinedGroups": true,
-    "lastBonusClaim": "2025-04-05T17:58:17.274Z",
-    "id": 2
   }
 ]

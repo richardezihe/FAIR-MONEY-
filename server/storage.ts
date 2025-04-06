@@ -170,7 +170,9 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
-    const user: User = { ...insertUser, id };
+    // Ensure isAdmin is explicitly set to avoid type errors
+    const isAdmin = insertUser.isAdmin ?? false;
+    const user: User = { ...insertUser, id, isAdmin };
     this.users.set(id, user);
     await this.saveUsers();
     return user;
@@ -201,7 +203,21 @@ export class MemStorage implements IStorage {
 
   async createTelegramUser(insertUser: InsertTelegramUser): Promise<TelegramUser> {
     const id = this.telegramUserIdCounter++;
-    const user: TelegramUser = { ...insertUser, id };
+    // Set default values for nullable fields
+    const user: TelegramUser = { 
+      ...insertUser, 
+      id,
+      username: insertUser.username ?? null,
+      lastName: insertUser.lastName ?? null,
+      balance: insertUser.balance ?? 0,
+      referrerId: insertUser.referrerId ?? null,
+      referralCount: insertUser.referralCount ?? 0,
+      hasJoinedGroups: insertUser.hasJoinedGroups ?? false,
+      lastBonusClaim: insertUser.lastBonusClaim ?? null,
+      bankAccountNumber: insertUser.bankAccountNumber ?? null,
+      bankName: insertUser.bankName ?? null,
+      bankAccountName: insertUser.bankAccountName ?? null
+    };
     this.telegramUsers.set(user.telegramId, user);
     await this.saveTelegramUsers();
     return user;
@@ -234,7 +250,13 @@ export class MemStorage implements IStorage {
   // Withdrawal request methods
   async createWithdrawalRequest(insertRequest: InsertWithdrawalRequest): Promise<WithdrawalRequest> {
     const id = this.withdrawalRequestIdCounter++;
-    const request: WithdrawalRequest = { ...insertRequest, id };
+    // Ensure status is set explicitly to avoid type errors
+    const status = insertRequest.status || 'pending';
+    const request: WithdrawalRequest = { 
+      ...insertRequest, 
+      id,
+      status
+    };
     this.withdrawalRequests.set(id, request);
     await this.saveWithdrawalRequests();
     return request;

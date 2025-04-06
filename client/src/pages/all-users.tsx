@@ -62,8 +62,9 @@ export default function AllUsers() {
         <div>
           {row.bankAccountNumber ? (
             <>
-              <div className="text-sm">{row.bankName}</div>
+              <div className="font-medium">{row.bankName}</div>
               <div className="text-xs text-gray-500">{row.bankAccountNumber}</div>
+              <div className="text-xs text-gray-500">{row.bankAccountName}</div>
             </>
           ) : (
             <span className="text-xs text-gray-500">Not set</span>
