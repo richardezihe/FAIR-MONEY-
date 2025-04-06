@@ -15,7 +15,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { apiRequest } from '@/lib/queryClient';
 import { formatCurrency } from '@/lib/utils';
-import { CheckCircle, XCircle, Calendar, Banknote } from 'lucide-react';
+import { CheckCircle, XCircle, Calendar, Banknote, User, CreditCard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface WithdrawalRequest {
@@ -99,10 +99,16 @@ export default function WithdrawalRequests() {
       key: 'bankDetails',
       header: 'Bank Details',
       cell: (row: WithdrawalRequest) => (
-        <div>
-          <div className="font-medium">{row.bankName}</div>
-          <div className="text-xs text-gray-500">{row.bankAccountNumber}</div>
-          <div className="text-xs text-gray-500">{row.bankAccountName}</div>
+        <div className="space-y-1">
+          <div className="font-medium text-blue-600">
+            {row.bankAccountName}
+          </div>
+          <div className="text-sm font-semibold">
+            {row.bankName}
+          </div>
+          <div className="text-sm text-gray-700 dark:text-gray-300">
+            Account: {row.bankAccountNumber}
+          </div>
         </div>
       ),
     },
@@ -237,47 +243,68 @@ export default function WithdrawalRequests() {
           </DialogHeader>
 
           {selectedRequest && (
-            <div className="space-y-4 py-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium">User</div>
-                <div>
-                  {selectedRequest.user?.firstName || ''} {selectedRequest.user?.lastName || ''}
+            <div className="space-y-6 py-3">
+              {/* User Information */}
+              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
+                <div className="text-sm font-semibold mb-3 flex items-center text-blue-600 dark:text-blue-400">
+                  <User className="w-4 h-4 mr-2" /> User Information
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">Full Name</div>
+                    <div className="font-medium">
+                      {selectedRequest.user?.firstName || ''} {selectedRequest.user?.lastName || ''}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">Telegram ID</div>
+                    <div className="font-mono text-sm">
+                      {selectedRequest.telegramUserId}
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium">Amount</div>
-                <div className="font-bold text-green-600 dark:text-green-500">
-                  {formatCurrency(selectedRequest.amount)}
+              {/* Payment Information */}
+              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
+                <div className="text-sm font-semibold mb-3 flex items-center text-green-600 dark:text-green-400">
+                  <CreditCard className="w-4 h-4 mr-2" /> Payment Information
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium flex items-center">
-                  <Banknote className="w-4 h-4 mr-1" /> Bank
-                </div>
-                <div>
-                  {selectedRequest.bankName}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium">Account</div>
-                <div>
-                  {selectedRequest.bankAccountNumber} ({selectedRequest.bankAccountName})
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium flex items-center">
-                  <Calendar className="w-4 h-4 mr-1" /> Date
-                </div>
-                <div>
-                  {new Date(selectedRequest.createdAt).toLocaleDateString('en-NG', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">Amount</div>
+                    <div className="font-bold text-green-600 dark:text-green-500">
+                      {formatCurrency(selectedRequest.amount)}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">Account Name</div>
+                    <div className="font-medium">
+                      {selectedRequest.bankAccountName}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">Bank Name</div>
+                    <div>
+                      {selectedRequest.bankName}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">Account Number</div>
+                    <div className="font-mono">
+                      {selectedRequest.bankAccountNumber}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-500">Request Date</div>
+                    <div>
+                      {new Date(selectedRequest.createdAt).toLocaleDateString('en-NG', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
