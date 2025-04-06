@@ -99,15 +99,26 @@ export default function WithdrawalRequests() {
       key: 'bankDetails',
       header: 'Bank Details',
       cell: (row: WithdrawalRequest) => (
-        <div className="space-y-1">
+        <div className="space-y-1 py-1">
           <div className="text-sm">
-            <span className="font-semibold">Account Name:</span> {row.bankAccountName}
+            Account Name:
           </div>
-          <div className="text-sm">
-            <span className="font-semibold">Bank:</span> {row.bankName}
+          <div className="text-sm font-medium">
+            {row.bankAccountName}
           </div>
-          <div className="text-sm">
-            <span className="font-semibold">Account #:</span> {row.bankAccountNumber}
+
+          <div className="text-sm mt-2">
+            Bank:
+          </div>
+          <div className="text-sm font-medium">
+            {row.bankName}
+          </div>
+
+          <div className="text-sm mt-2">
+            Account #:
+          </div>
+          <div className="text-sm font-medium">
+            {row.bankAccountNumber}
           </div>
         </div>
       ),
@@ -277,21 +288,21 @@ export default function WithdrawalRequests() {
                       {formatCurrency(selectedRequest.amount)}
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-500">Account Name</div>
+                  <div className="space-y-1">
+                    <div className="text-sm text-gray-500">Account Name:</div>
                     <div className="font-medium">
                       {selectedRequest.bankAccountName}
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-500">Bank Name</div>
-                    <div>
+                  <div className="space-y-1 mt-2">
+                    <div className="text-sm text-gray-500">Bank:</div>
+                    <div className="font-medium">
                       {selectedRequest.bankName}
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-500">Account Number</div>
-                    <div className="font-mono">
+                  <div className="space-y-1 mt-2">
+                    <div className="text-sm text-gray-500">Account #:</div>
+                    <div className="font-medium">
                       {selectedRequest.bankAccountNumber}
                     </div>
                   </div>
