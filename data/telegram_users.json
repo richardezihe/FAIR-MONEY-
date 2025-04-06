@@ -5,10 +5,13 @@
     "lastName": "",
     "username": "Ezihe001",
     "joinedAt": "2025-04-06T06:50:28.355Z",
-    "balance": 41000,
+    "balance": 42000,
     "referralCount": 1,
     "hasJoinedGroups": true,
-    "lastBonusClaim": "2025-04-06T07:44:05.487Z",
+    "lastBonusClaim": "2025-04-06T07:49:17.020Z",
+    "bankAccountNumber": "6117325381",
+    "bankName": "OPay",
+    "bankAccountName": "JULIET CHIDINMA EZIHE",
     "id": 1
   },
   {

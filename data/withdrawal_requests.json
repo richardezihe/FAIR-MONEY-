@@ -2,11 +2,11 @@
   {
     "telegramUserId": "8045084951",
     "amount": 20000,
-    "createdAt": "2025-04-06T07:44:25.380Z",
-    "status": "rejected",
-    "bankAccountNumber": "",
-    "bankName": "",
-    "bankAccountName": "",
-    "id": 1
+    "createdAt": "2025-04-06T07:54:00.000Z",
+    "status": "pending",
+    "bankAccountNumber": "6117325381",
+    "bankName": "OPay",
+    "bankAccountName": "JULIET CHIDINMA EZIHE",
+    "id": 4
   }
 ]
