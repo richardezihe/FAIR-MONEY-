@@ -100,14 +100,14 @@ export default function WithdrawalRequests() {
       header: 'Bank Details',
       cell: (row: WithdrawalRequest) => (
         <div className="space-y-1">
-          <div className="font-medium text-blue-600">
-            {row.bankAccountName}
+          <div className="text-sm">
+            <span className="font-semibold">Account Name:</span> {row.bankAccountName}
           </div>
-          <div className="text-sm font-semibold">
-            {row.bankName}
+          <div className="text-sm">
+            <span className="font-semibold">Bank:</span> {row.bankName}
           </div>
-          <div className="text-sm text-gray-700 dark:text-gray-300">
-            Account: {row.bankAccountNumber}
+          <div className="text-sm">
+            <span className="font-semibold">Account #:</span> {row.bankAccountNumber}
           </div>
         </div>
       ),

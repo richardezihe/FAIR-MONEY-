@@ -3,10 +3,20 @@
     "telegramUserId": "8045084951",
     "amount": 20000,
     "createdAt": "2025-04-06T07:30:37.765Z",
-    "status": "pending",
+    "status": "rejected",
     "bankAccountNumber": "",
     "bankName": "",
     "bankAccountName": "",
     "id": 1
+  },
+  {
+    "telegramUserId": "8045084951",
+    "amount": 20000,
+    "createdAt": "2025-04-06T07:39:17.502Z",
+    "status": "pending",
+    "bankAccountNumber": "",
+    "bankName": "",
+    "bankAccountName": "",
+    "id": 2
   }
 ]
