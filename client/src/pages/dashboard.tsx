@@ -44,8 +44,8 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       toast({
-        title: "System Reset",
-        description: "All user data has been reset successfully.",
+        title: "Withdrawal Requests Reset",
+        description: "All withdrawal requests have been cleared while preserving user data.",
         variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/dashboard'] });
@@ -171,14 +171,14 @@ export default function Dashboard() {
                 size="sm" 
                 className="text-red-600 border-red-600 hover:bg-red-50 dark:text-red-400 dark:border-red-400 dark:hover:bg-red-900 gap-1">
                 <RotateCcw className="h-4 w-4" />
-                Reset All Data
+                Reset Withdrawal Requests
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Reset System Data</AlertDialogTitle>
+                <AlertDialogTitle>Reset Withdrawal Requests</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will delete all user data, withdrawals, and reset the system to its initial state. This action cannot be undone.
+                  This will delete all withdrawal requests while preserving Telegram user data. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -199,7 +199,7 @@ export default function Dashboard() {
                       </svg>
                       Resetting...
                     </span>
-                  ) : "Reset All Data"}
+                  ) : "Reset Withdrawals"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

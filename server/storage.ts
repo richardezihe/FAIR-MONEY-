@@ -31,6 +31,7 @@ export interface IStorage {
   
   // System operations
   resetAllData(): Promise<void>;
+  resetWithdrawalRequests(): Promise<void>;
 }
 
 const DATA_PATH = path.join(process.cwd(), 'data');
@@ -303,6 +304,20 @@ export class MemStorage implements IStorage {
     await this.saveWithdrawalRequests();
     
     console.log('All data has been reset successfully');
+  }
+  
+  // Reset only withdrawal requests, preserve Telegram users
+  async resetWithdrawalRequests(): Promise<void> {
+    // Clear only withdrawal requests
+    this.withdrawalRequests.clear();
+    
+    // Reset only withdrawal requests counter
+    this.withdrawalRequestIdCounter = 1;
+    
+    // Save empty withdrawal requests data
+    await this.saveWithdrawalRequests();
+    
+    console.log('Withdrawal requests have been reset successfully');
   }
 }
 

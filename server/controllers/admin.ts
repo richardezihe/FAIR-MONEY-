@@ -153,13 +153,13 @@ export async function getAllUsers(req: Request, res: Response) {
 
 export async function resetAllData(req: Request, res: Response) {
   try {
-    // Clear all telegram users and withdrawal requests
-    await storage.resetAllData();
+    // Only reset withdrawal requests, preserve Telegram users
+    await storage.resetWithdrawalRequests();
     
-    console.log('All data has been reset successfully');
-    res.status(200).json({ message: 'All data has been reset successfully' });
+    console.log('Withdrawal requests have been reset successfully');
+    res.status(200).json({ message: 'Withdrawal requests have been reset successfully' });
   } catch (error) {
-    console.error('Reset all data error:', error);
-    res.status(500).json({ message: 'Failed to reset data' });
+    console.error('Reset withdrawal requests error:', error);
+    res.status(500).json({ message: 'Failed to reset withdrawal requests' });
   }
 }
