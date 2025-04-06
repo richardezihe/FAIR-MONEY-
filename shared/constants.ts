@@ -16,7 +16,7 @@ export const REQUIRED_GROUPS = [
 ];
 
 export const SUPPORT_CHANNEL = 'naijavaluesupport';
-export const NEWS_CHANNEL = 'Fairmoneybotchannel';
+export const NEWS_CHANNEL = 'naijavaluecommunity';
 
 // Financial constants
 export const CURRENCY = '₦';
