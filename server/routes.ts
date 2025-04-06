@@ -48,6 +48,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/withdrawal-requests', requireAuth, requireAdmin, adminController.getWithdrawalRequests);
   app.post('/api/admin/withdrawal-requests/update', requireAuth, requireAdmin, adminController.updateWithdrawalStatus);
   app.get('/api/admin/users', requireAuth, requireAdmin, adminController.getAllUsers);
+  app.post('/api/admin/reset', requireAuth, requireAdmin, adminController.resetAllData);
   
   // Bot webhook and API routes
   app.post('/api/bot/webhook', botController.handleWebhook);

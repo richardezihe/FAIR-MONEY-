@@ -33,6 +33,9 @@ interface WithdrawalRequest {
     lastName?: string;
     username?: string;
     balance: number;
+    bankAccountNumber?: string;
+    bankName?: string;
+    bankAccountName?: string;
   };
 }
 
@@ -97,9 +100,9 @@ export default function WithdrawalRequests() {
       header: 'Bank Details',
       cell: (row: WithdrawalRequest) => (
         <div>
-          <div className="font-medium">{row.bankName}</div>
-          <div className="text-xs text-gray-500">{row.bankAccountNumber}</div>
-          <div className="text-xs text-gray-500">{row.bankAccountName}</div>
+          <div className="font-medium">{row.bankName || row.user?.bankName || "N/A"}</div>
+          <div className="text-xs text-gray-500">{row.bankAccountNumber || row.user?.bankAccountNumber || "N/A"}</div>
+          <div className="text-xs text-gray-500">{row.bankAccountName || row.user?.bankAccountName || "N/A"}</div>
         </div>
       ),
     },

@@ -46,7 +46,10 @@ export async function getWithdrawalRequests(req: Request, res: Response) {
             firstName: user.firstName,
             lastName: user.lastName,
             username: user.username,
-            balance: user.balance
+            balance: user.balance,
+            bankAccountNumber: user.bankAccountNumber,
+            bankName: user.bankName,
+            bankAccountName: user.bankAccountName
           } : null
         };
       })
@@ -145,5 +148,18 @@ export async function getAllUsers(req: Request, res: Response) {
   } catch (error) {
     console.error('Get all users error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+}
+
+export async function resetAllData(req: Request, res: Response) {
+  try {
+    // Clear all telegram users and withdrawal requests
+    await storage.resetAllData();
+    
+    console.log('All data has been reset successfully');
+    res.status(200).json({ message: 'All data has been reset successfully' });
+  } catch (error) {
+    console.error('Reset all data error:', error);
+    res.status(500).json({ message: 'Failed to reset data' });
   }
 }

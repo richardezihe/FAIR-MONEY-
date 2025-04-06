@@ -1,9 +1,24 @@
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Activity, Users, DollarSign, Clock } from 'lucide-react';
+import { Activity, Users, DollarSign, Clock, RotateCcw } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface DashboardStats {
   totalUsers: number;
@@ -17,6 +32,34 @@ interface DashboardStats {
 export default function Dashboard() {
   const { data, isLoading, error } = useQuery<DashboardStats>({
     queryKey: ['/api/admin/dashboard'],
+  });
+  
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  
+  const resetDataMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('POST', '/api/admin/reset');
+    },
+    onSuccess: () => {
+      toast({
+        title: "System Reset",
+        description: "All user data has been reset successfully.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/withdrawals'] });
+      setIsResetDialogOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Reset Failed",
+        description: error instanceof Error ? error.message : "An error occurred",
+        variant: "destructive",
+      });
+    },
   });
 
   if (error) {
@@ -119,8 +162,48 @@ export default function Dashboard() {
 
       {/* Welcome card */}
       <Card className="mt-6">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Welcome to FAIR MONEY Admin Dashboard</CardTitle>
+          <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-red-600 border-red-600 hover:bg-red-50 dark:text-red-400 dark:border-red-400 dark:hover:bg-red-900 gap-1">
+                <RotateCcw className="h-4 w-4" />
+                Reset All Data
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset System Data</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will delete all user data, withdrawals, and reset the system to its initial state. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  className="bg-red-600 hover:bg-red-700"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent default to handle manually
+                    resetDataMutation.mutate();
+                  }}
+                  disabled={resetDataMutation.isPending}
+                >
+                  {resetDataMutation.isPending ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Resetting...
+                    </span>
+                  ) : "Reset All Data"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardHeader>
         <CardContent className="text-gray-500 dark:text-gray-400">
           <p>

@@ -28,6 +28,9 @@ export interface IStorage {
   getAllWithdrawalRequests(): Promise<WithdrawalRequest[]>;
   updateWithdrawalRequestStatus(id: number, status: string): Promise<WithdrawalRequest | undefined>;
   getTotalWithdrawalAmount(): Promise<number>;
+  
+  // System operations
+  resetAllData(): Promise<void>;
 }
 
 const DATA_PATH = path.join(process.cwd(), 'data');
@@ -261,6 +264,23 @@ export class MemStorage implements IStorage {
     return Array.from(this.withdrawalRequests.values())
       .filter(request => request.status === 'approved')
       .reduce((total, request) => total + request.amount, 0);
+  }
+  
+  // System operations
+  async resetAllData(): Promise<void> {
+    // Keep admin users but reset everything else
+    this.telegramUsers.clear();
+    this.withdrawalRequests.clear();
+    
+    // Reset counters (except for admin users)
+    this.telegramUserIdCounter = 1;
+    this.withdrawalRequestIdCounter = 1;
+    
+    // Save empty data
+    await this.saveTelegramUsers();
+    await this.saveWithdrawalRequests();
+    
+    console.log('All data has been reset successfully');
   }
 }
 
