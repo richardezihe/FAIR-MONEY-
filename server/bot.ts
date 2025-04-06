@@ -213,7 +213,9 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
         `Account Name: ${user.bankAccountName}\n\n` +
         `✅ These details will be used for all withdrawals.\n\n` +
         `To update your details, just type them below in any format.`,
-        Markup.removeKeyboard()
+        Markup.keyboard([['Cancel']])
+          .resize()
+          .oneTime()
       );
       
       // Set context to wait for new bank details
@@ -223,6 +225,17 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
       };
     } else {
       await promptForBankDetails(ctx);
+    }
+  });
+  
+  // Handle cancel button for bank details
+  bot.hears('Cancel', async (ctx) => {
+    // Reset the waiting state
+    if (ctx.session?.waitingForBankDetails) {
+      ctx.session.waitingForBankDetails = false;
+      await ctx.reply("Bank details update cancelled.", getMainMenuKeyboard());
+    } else {
+      await ctx.reply("Returning to main menu...", getMainMenuKeyboard());
     }
   });
   
@@ -287,14 +300,33 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
       return;
     }
     
+    // Check if user has provided valid bank details
+    if (!user.bankAccountNumber || !user.bankName || !user.bankAccountName || 
+        user.bankAccountNumber.trim() === "" || 
+        user.bankName.trim() === "" || 
+        user.bankAccountName.trim() === "") {
+      
+      await ctx.reply(
+        "⚠️ You need to set up your bank details before making a withdrawal.\n\n" +
+        "Please use the Account Details button to set up your bank information first.",
+        getMainMenuKeyboard()
+      );
+      return;
+    }
+    
     // Prompt for withdrawal amount
     await ctx.reply(
       `💸 Withdrawal Request\n\n` +
       `Your current balance: ${formatCurrency(user.balance || 0)}\n\n` +
       `Minimum withdrawal: ${formatCurrency(MIN_WITHDRAWAL_AMOUNT)}\n` +
       `Maximum withdrawal: ${formatCurrency(MAX_WITHDRAWAL_AMOUNT)}\n\n` +
+      `Bank Account: ${user.bankAccountNumber}\n` +
+      `Bank Name: ${user.bankName}\n` +
+      `Account Name: ${user.bankAccountName}\n\n` +
       `Please enter the amount you want to withdraw (${CURRENCY}XXXX):`,
-      Markup.removeKeyboard()
+      Markup.keyboard([['Cancel']])
+        .resize()
+        .oneTime()
     );
     
     // Set context to wait for amount
@@ -375,13 +407,20 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
       const singleLinePattern = /^\s*(\d+)\s+(.+)\s+(.+)\s*$/;
       const singleLineMatch = text.match(singleLinePattern);
       
-      // Default bank details if user doesn't provide them
-      let accountNumber, bankName, accountName;
+      // 3. Try to extract account number pattern with digits
+      const accountNumberPattern = /\b\d{10,11}\b/; // Nigerian account numbers are typically 10-11 digits
+      const accountNumberMatch = text.match(accountNumberPattern);
+      
+      let accountNumber = '';
+      let bankName = '';
+      let accountName = '';
+      let validDetails = false;
       
       // Process the bank details if we have a valid format
       if (textLines.length === 3) {
         // Multi-line format
         [accountNumber, bankName, accountName] = textLines;
+        validDetails = true;
       } else if (singleLineMatch) {
         // Single line format
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -389,11 +428,46 @@ function setupBotCommands(bot: Telegraf<BotContext>) {
         accountNumber = accNum;
         bankName = bnkName;
         accountName = accName;
-      } else {
-        // If format is invalid, use default values
-        accountNumber = "123456789";
-        bankName = "Sample Bank";
+        validDetails = true;
+      } else if (accountNumberMatch && text.length > accountNumberMatch[0].length) {
+        // Found an account number and some additional text
+        accountNumber = accountNumberMatch[0];
+        
+        // Try to extract the remaining text as bank name and account name
+        const remainingText = text.replace(accountNumber, '').trim();
+        
+        if (remainingText.includes(' ')) {
+          // Split the remaining text into bank name and account name
+          const splitIdx = remainingText.indexOf(' ');
+          bankName = remainingText.substring(0, splitIdx).trim();
+          accountName = remainingText.substring(splitIdx).trim();
+          validDetails = true;
+        } else if (remainingText.length > 0) {
+          // Just use the remaining text as bank name
+          bankName = remainingText;
+          accountName = user.firstName + " " + (user.lastName || "");
+          validDetails = true;
+        }
+      } else if (accountNumberMatch) {
+        // Just found an account number
+        accountNumber = accountNumberMatch[0];
+        // Use the most common bank in Nigeria as a fallback
+        bankName = "Please specify your bank name";
         accountName = user.firstName + " " + (user.lastName || "");
+        validDetails = true;
+      }
+      
+      if (!validDetails) {
+        // If no valid details were found, ask the user to provide proper format
+        await ctx.reply(
+          `⚠️ Invalid bank details format. Please provide your details in this format:\n\n` +
+          `Account Number\nBank Name\nAccount Name\n\n` +
+          `For example:\n1234567890\nAccess Bank\nJohn Doe`,
+          Markup.keyboard([['Cancel']])
+            .resize()
+            .oneTime()
+        );
+        return;
       }
       
       // Update user's bank details
@@ -516,8 +590,13 @@ async function promptToJoinGroups(ctx: BotContext) {
 async function promptForBankDetails(ctx: BotContext) {
   await ctx.reply(
     `💎 Enter Bank Details 💎\n\n` +
-    `Simply type a number for your account or you can press any key to continue with default bank details.\n\n` +
-    `Your details will be used for processing withdrawals.`
+    `Please provide your bank details in the following format:\n\n` +
+    `Account Number\nBank Name\nAccount Name\n\n` +
+    `For example:\n1234567890\nAccess Bank\nJohn Doe\n\n` +
+    `Your details will be used for processing withdrawals.`,
+    Markup.keyboard([['Cancel']])
+      .resize()
+      .oneTime()
   );
   
   // Set context to wait for bank details
