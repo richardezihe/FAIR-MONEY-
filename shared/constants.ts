@@ -21,7 +21,7 @@ export const NEWS_CHANNEL = 'naijavaluecommunity';
 // Financial constants
 export const CURRENCY = '₦';
 export const CLAIM_BONUS_AMOUNT = 1000;
-export const REFERRAL_BONUS_AMOUNT = 20000;
+export const REFERRAL_BONUS_AMOUNT = 5000;
 export const MIN_WITHDRAWAL_AMOUNT = 20000;
 export const MAX_WITHDRAWAL_AMOUNT = 100000;
 export const CLAIM_COOLDOWN_MINUTES = 1;
