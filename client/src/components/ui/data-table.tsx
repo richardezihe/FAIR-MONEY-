@@ -44,10 +44,10 @@ export function DataTable<T extends Record<string, any>>({
   // Paginate data
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
+  // Determine which data to display
+const displayData = pagination 
+  ? filteredData.slice(startIndex, startIndex + itemsPerPage) 
+  : filteredData;
 
   return (
     <div className="space-y-4">
