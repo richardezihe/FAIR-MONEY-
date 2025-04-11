@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 interface DataTableProps<T> {
+   pagination?: boolean; // Set to false to disable pagination
   data: T[];
   columns: {
     key: string;
@@ -77,31 +78,31 @@ const displayData = pagination
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.length > 0 ? (
-              paginatedData.map((item, index) => (
-                <TableRow
-                  key={index}
-                  onClick={() => onRowClick && onRowClick(item)}
-                  className={onRowClick ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800' : ''}
-                >
-                  {columns.map((column) => (
-                    <TableCell key={`${index}-${column.key}`}>
-                      {column.cell(item)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-center py-8 text-gray-500 dark:text-gray-400"
-                >
-                  No results found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+  {displayData.length > 0 ? (
+    displayData.map((item, index) => (
+      <TableRow
+        key={index}
+        onClick={() => onRowClick && onRowClick(item)}
+        className={onRowClick ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800' : ''}
+      >
+        {columns.map((column) => (
+          <TableCell key={`${index}-${column.key}`}>
+            {column.cell(item)}
+          </TableCell>
+        ))}
+      </TableRow>
+    ))
+  ) : (
+    <TableRow>
+      <TableCell
+        colSpan={columns.length}
+        className="text-center py-8 text-gray-500 dark:text-gray-400"
+      >
+        No results found
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
         </Table>
       </div>
 
