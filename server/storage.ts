@@ -146,7 +146,7 @@ export class MemStorage implements IStorage {
   await saveData(Array.from(this.users.values()), USERS_FILE);
   }
 
-  private async saveTelegramUsers() {
+  private async saveTelegramUsers(): Promise<void> {
   try {
     console.log(`Saving ${this.telegramUsers.size} Telegram users to file`);
     await ensureDataDir();
