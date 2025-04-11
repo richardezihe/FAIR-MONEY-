@@ -157,8 +157,8 @@ export class MemStorage implements IStorage {
     console.error(`ERROR saving Telegram users to ${TELEGRAM_USERS_FILE}:`, error);
   }
 
-  private async saveWithdrawalRequests() {
-    await saveData(Array.from(this.withdrawalRequests.values()), WITHDRAWAL_REQUESTS_FILE);
+  private async saveWithdrawalRequests(): Promise<void> {
+  await saveData(Array.from(this.withdrawalRequests.values()), WITHDRAWAL_REQUESTS_FILE);
   }
 
   private async saveSessions() {
