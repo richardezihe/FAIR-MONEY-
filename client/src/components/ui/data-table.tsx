@@ -107,8 +107,8 @@ const displayData = pagination
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
+{pagination && totalPages > 1 && (
+  <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Showing {startIndex + 1}-
             {Math.min(startIndex + itemsPerPage, filteredData.length)} of{' '}
