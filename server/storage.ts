@@ -41,7 +41,7 @@ const WITHDRAWAL_REQUESTS_FILE = path.join(DATA_PATH, 'withdrawal_requests.json'
 const SESSIONS_FILE = path.join(DATA_PATH, 'sessions.json');
 
 // Ensure data directory exists
-async function ensureDataDir() {
+async function ensureDataDir(): Promise<void> {
   try {
     await fs.mkdir(DATA_PATH, { recursive: true });
   } catch (error) {
@@ -50,7 +50,7 @@ async function ensureDataDir() {
 }
 
 // Save data to JSON file
-async function saveData<T>(data: T, filePath: string) {
+async function saveData<T>(data: T, filePath: string): Promise<void> {
   try {
     await ensureDataDir();
     await fs.writeFile(filePath, JSON.stringify(data, null, 2));
@@ -103,7 +103,7 @@ export class MemStorage implements IStorage {
     this.loadData();
   }
 
-  private async loadData() {
+  private async loadData(): Promise<void> {
     // Load users
     const users = await loadData<User[]>(USERS_FILE, []);
     users.forEach(user => {
@@ -143,26 +143,27 @@ export class MemStorage implements IStorage {
   }
 
   private async saveUsers(): Promise<void> {
-  await saveData(Array.from(this.users.values()), USERS_FILE);
+    await saveData(Array.from(this.users.values()), USERS_FILE);
   }
 
   private async saveTelegramUsers(): Promise<void> {
-  try {
-    console.log(`Saving ${this.telegramUsers.size} Telegram users to file`);
-    await ensureDataDir();
-    const usersArray = Array.from(this.telegramUsers.values());
-    await fs.writeFile(TELEGRAM_USERS_FILE, JSON.stringify(usersArray, null, 2));
-    console.log(`Successfully saved ${usersArray.length} Telegram users to ${TELEGRAM_USERS_FILE}`);
-  } catch (error) {
-    console.error(`ERROR saving Telegram users to ${TELEGRAM_USERS_FILE}:`, error);
+    try {
+      console.log(`Saving ${this.telegramUsers.size} Telegram users`);
+      await ensureDataDir();
+      const usersArray = Array.from(this.telegramUsers.values());
+      await fs.writeFile(TELEGRAM_USERS_FILE, JSON.stringify(usersArray, null, 2));
+      console.log(`Successfully saved ${usersArray.length} Telegram users`);
+    } catch (error) {
+      console.error(`ERROR saving Telegram users:`, error);
+    }
   }
 
   private async saveWithdrawalRequests(): Promise<void> {
-  await saveData(Array.from(this.withdrawalRequests.values()), WITHDRAWAL_REQUESTS_FILE);
+    await saveData(Array.from(this.withdrawalRequests.values()), WITHDRAWAL_REQUESTS_FILE);
   }
 
   private async saveSessions(): Promise<void> {
-  await saveData(Array.from(this.sessions.values()), SESSIONS_FILE);
+    await saveData(Array.from(this.sessions.values()), SESSIONS_FILE);
   }
 
   // User methods
