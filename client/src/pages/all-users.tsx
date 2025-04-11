@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import AdminLayout from '@/components/layout/AdminLayout';
 import { DataTable } from '@/components/ui/data-table';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,6 +28,7 @@ export default function AllUsers() {
   const { data, isLoading, error } = useQuery<TelegramUser[]>({
     queryKey: ['/api/admin/users'],
   });
+    const allUsers = data || [];
 
   const columns = [
     {
@@ -175,10 +177,11 @@ export default function AllUsers() {
           </div>
 
           <DataTable
-            data={data || []}
-            columns={columns}
-            searchField="firstName"
-          />
+  data={allUsers}
+  columns={columns}
+  searchField="firstName"
+  pagination={false}
+/>
         </>
       )}
     </AdminLayout>
