@@ -220,11 +220,12 @@ export default function WithdrawalRequests() {
         </div>
       ) : (
         <DataTable
-          data={data || []}
-          columns={columns}
-          searchField="bankAccountName"
-          onRowClick={(row) => setSelectedRequest(row)}
-        />
+  data={data || []}
+  columns={columns}
+  searchField="bankAccountName"
+  onRowClick={(row) => setSelectedRequest(row)}
+  pagination={false} // Disable pagination to show all records
+/>
       )}
 
       {/* Confirmation Dialog */}
