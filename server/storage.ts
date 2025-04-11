@@ -142,8 +142,8 @@ export class MemStorage implements IStorage {
     }
   }
 
-  private async saveUsers() {
-    await saveData(Array.from(this.users.values()), USERS_FILE);
+  private async saveUsers(): Promise<void> {
+  await saveData(Array.from(this.users.values()), USERS_FILE);
   }
 
   private async saveTelegramUsers() {
@@ -161,8 +161,8 @@ export class MemStorage implements IStorage {
   await saveData(Array.from(this.withdrawalRequests.values()), WITHDRAWAL_REQUESTS_FILE);
   }
 
-  private async saveSessions() {
-    await saveData(Array.from(this.sessions.values()), SESSIONS_FILE);
+  private async saveSessions(): Promise<void> {
+  await saveData(Array.from(this.sessions.values()), SESSIONS_FILE);
   }
 
   // User methods
