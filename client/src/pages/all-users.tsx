@@ -177,10 +177,10 @@ export default function AllUsers() {
           </div>
 
           <DataTable
-  data={allUsers}
+  data={data || []}
   columns={columns}
   searchField="firstName"
-  pagination={false}
+  pagination={false} // Disable pagination
 />
         </>
       )}
