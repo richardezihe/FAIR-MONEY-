@@ -27,6 +27,7 @@ export function DataTable<T extends Record<string, any>>({
   columns,
   searchField,
   onRowClick,
+  pagination = true, // Default to true for backward compatibility
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
